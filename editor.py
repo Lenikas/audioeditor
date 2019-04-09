@@ -25,6 +25,7 @@ def cut():
     """
     data_bytes = open(sys.argv[1], 'rb').read()
     print(data_bytes[-1])
+    # проверка на работу
 
 
 
