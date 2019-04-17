@@ -17,7 +17,7 @@ def extract_headers(data):
     print(inf_chunks)
     return inf_chunks
 
-
+#proverka
 def extract_size(data):
     return struct.unpack_from('<I', data[4: 8])[0] + 8
 
