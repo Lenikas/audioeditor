@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
-import sys
 import struct
+from main import *
 
 
 def extract_headers(data):
@@ -20,7 +20,7 @@ def extract_headers(data):
             break
     print(inf_chunks)
     return inf_chunks
-#proverka
+
 
 def extract_size(data):
     """Возвращает размер файла в байтах"""
@@ -101,18 +101,37 @@ def read_two_files(file_one, file_two):
     return data_one,data_two
 
 
-def reverse_audio(data):
+def reverse_audio(file):
     """не работает,в результате шум"""
+    with open(file, 'rb') as file:
+        data = file.read()
     result = data[:44]
-    rev = bytes(reversed(data[44:]))
-    result += rev
+    array = bytearray(data[44:])
+    chunk = bytes()
+    count = 0
+    print(data[46])
+    print(bytes(array[46]))
+    for i in range(len(array)):
+
+        chunk += bytes(array[i])
+        count += 1
+        if count == 4:
+            count = 0
+            result += bytes(reversed(chunk))
+            chunk = bytes()
+
     with open('reverse.wav', 'wb') as file:
         file.write(result)
 
 
-def create_any_channels(data, count_channels):
+def create_any_channels(file, count_channels):
+    """Изменяет количество каналов
+    Возвращает аудио с измененным в количество каналов звучанием
+    """
+    with open(file, 'rb') as file:
+        data = file.read()
     result = data[:22]
-    new_channels = count_channels
+    new_channels = int(count_channels)
     result += struct.pack('>H', new_channels)
     result += data[24:]
     with open('in_any_channels.wav', 'wb') as file:
@@ -120,20 +139,25 @@ def create_any_channels(data, count_channels):
 
 
 
-def make_copy_audio(data):
+def make_copy_audio(file):
     """Создает копию аудиофайла
     Записывает данные входящего аудио в новый файл
     """
+    with open(file, 'rb') as file:
+        data = file.read()
     with open('сopy.wav', 'wb') as file:
         file.write(data)
 
 
 
-def cut_audio(data, how_much):
+def cut_audio(file, how_much):
     """Записывает в новый файл часть входящего файла
     Отрезает от входящего аудио какую-то часть(работает пока только с целыми числами)
     и записывает в новый файл.На выходе получаем новое аудио, являющееся отрезком входящего
     """
+    how_much = int(how_much)
+    with open(file, 'rb') as file:
+        data = file.read()
     size = extract_size(data)
     new_size = size // how_much
     result = b'RIFF'
@@ -149,11 +173,15 @@ def cut_audio(data, how_much):
         file.write(result)
 
 
-def splice_audio(data_one, data_two):
+def splice_audio(file_one, file_two):
     """Склеивает два аудио подряд
     Создает новый файл, являющийся склейкой двух входящих файлов,и записывает в него
     последовательно wav данные первого и второго аудио
     """
+    with open(file_one, 'rb') as file:
+        data_one = file.read()
+    with open(file_two, 'rb') as file:
+        data_two = file.read()
     size_one = extract_size(data_one)
     size_two = extract_size(data_two)
     new_size = size_one + size_two
@@ -170,14 +198,7 @@ def splice_audio(data_one, data_two):
         file.write(result)
 
 
-def main():
-    if sys.argv[1] == 'cut':
-        data = read_file(sys.argv[3])
-        len_cut = int(sys.argv[2])
-        cut_audio(data, len_cut)
-    if sys.argv[1] == 'splice':
-        data = read_two_files(sys.argv[2], sys.argv[3])
-        splice_audio(data[0], data[1])
+
 
 
 
