@@ -1,7 +1,9 @@
 import argparse
 import re
+import struct
 import sys
-from editor import *
+from editor_console import *
+
 
 
 def parse_args():
