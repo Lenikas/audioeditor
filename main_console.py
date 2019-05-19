@@ -1,9 +1,5 @@
-import argparse
-import re
-import struct
-import sys
 from editor_console import *
-
+import argparse
 
 
 def parse_args():
@@ -19,58 +15,77 @@ def parse_args():
 
 
 def write_in_this(args, data):
-    with open(args[1], "rb+") as file:
+    file_for_write = args[1]
+    with open(file_for_write, "rb+") as file:
         file.truncate()
         file.seek(0)
         file.write(data)
 
 
 def process_cut(args):
-    with open(args[1], "rb") as file:
+    file_for_work = args[1]
+    num_for_cut = args[2]
+    key_which_file = args[0]
+    with open(file_for_work, "rb") as file:
         data = FunctionForWav(file.read())
-    cut_data = data.cut_audio(args[2])
-    if args[0] == 'new':
+        # # result = data[:36]
+        # # result += data[70:]
+        # # result = FunctionForWav(result)
+        # print(FunctionForWav(data).extract_headers())
+        # print(data[20:22])
+    cut_data = data.cut_audio(num_for_cut)
+    if key_which_file == 'new':
         with open("cut_audio.wav", 'wb') as file:
             file.write(cut_data)
-    elif args[0] == 'this':
+    elif key_which_file == 'this':
         write_in_this(args, cut_data)
 
 
 def process_splice(args):
-    with open(args[0], "rb") as file:
+    file_for_work1 = args[0]
+    file_for_work2 = args[1]
+    with open(file_for_work1, "rb") as file:
         data_one = FunctionForWav(file.read())
-    with open(args[1], "rb") as file:
+    with open(file_for_work2, "rb") as file:
         data_two = FunctionForWav(file.read())
     with open("splice_audio.wav", 'wb') as file:
         file.write(data_one.splice_audio(data_two))
 
 
 def process_copy(args):
-    with open(args[0], 'rb') as file:
+    file_for_work = args[0]
+    with open(file_for_work, 'rb') as file:
         data = FunctionForWav(file.read())
     with open("copy_audio.wav", 'wb') as file:
         file.write(data)
 
 
 def process_reverse(args):
-    with open(args[1], "rb") as file:
+    file_for_work = args[1]
+    key_which_file = args[0]
+    with open(file_for_work, "rb") as file:
         data = FunctionForWav(file.read())
+        # result = data[:36]
+        # result += data[70:]
+        # result = FunctionForWav(result)
     reverse_data = data.reverse_audio()
-    if args[0] == 'new':
+    if key_which_file == 'new':
         with open("reverse_audio.wav", 'wb') as file:
             file.write(reverse_data)
-    elif args[0] == 'this':
+    elif key_which_file == 'this':
         write_in_this(args, reverse_data)
 
 
 def process_speed(args):
-    with open(args[1], "rb") as file:
+    file_for_work = args[1]
+    key_which_file = args[0]
+    with open(file_for_work, "rb") as file:
         data = FunctionForWav(file.read())
     speed_data = data.change_speed(args[2])
-    if args[0] == 'new':
+    if key_which_file == 'new':
         with open("speed.wav", 'wb') as file:
             file.write(speed_data)
-    elif args[0] == 'this':
+    elif key_which_file == 'this':
         write_in_this(args, speed_data)
 
 
@@ -102,6 +117,3 @@ def main():
     #             file.write(data)
     #     else:
     #         print('unknown command')
-
-
-
